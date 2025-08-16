@@ -1,6 +1,7 @@
 services:
   traefik:
     image: traefik:v3.0
+    container_name: n8n_proxy
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -28,7 +29,7 @@ services:
     restart: always
     container_name: n8n_service
     environment:
-      - DB_TYPE=postgres
+      - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=${DB_HOST}
       - DB_POSTGRESDB_PORT=${DB_PORT}
       - DB_POSTGRESDB_DATABASE=${DB_NAME}
@@ -39,7 +40,9 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
       - N8N_HOST=${N8N_HOST}
       - N8N_PORT=5678
-      - N8N_PROTOCOL=https
+      - N8N_PROTOCOL=http
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - GENERIC_TIMEZONE=Europe/Moscow
     volumes:
       - n8n_data:/home/node/.n8n
@@ -54,7 +57,7 @@ services:
     networks:
       - proxy
       - internal
-  
+
   n8n_db:
     image: postgres:15
     restart: always
